@@ -2,10 +2,12 @@
 const boardEl = document.getElementById("board");
 const statusEl = document.getElementById("status");
 const restartBtn = document.getElementById("restart");
+const pvpBtn = document.getElementById("pvpBtn");
 const easyBtn = document.getElementById("easyBtn");
 const hardBtn = document.getElementById("hardBtn");
 const difficultyDisplay = document.getElementById("currentDifficulty");
 
+const STORAGE_KEY = "tictactoe_state";
 
 let currentPlayer = "X";
 let board = Array(9).fill("");
@@ -28,6 +30,40 @@ const winPatterns = [
   [0, 4, 8],
   [2, 4, 6]
 ];
+
+function saveGameState() {
+  const state = {
+    board,
+    currentPlayer,
+    isRunning,
+    difficulty,
+    gameStats
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function loadGameState() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      const state = JSON.parse(saved);
+      board = state.board || Array(9).fill("");
+      currentPlayer = state.currentPlayer || "X";
+      isRunning = state.isRunning !== undefined ? state.isRunning : true;
+      difficulty = state.difficulty || null;
+      gameStats = state.gameStats || { xWins: 0, oWins: 0, draws: 0 };
+      return true;
+    } catch (e) {
+      console.error("Error loading game state:", e);
+      return false;
+    }
+  }
+  return false;
+}
+
+function clearGameState() {
+  localStorage.removeItem(STORAGE_KEY);
+}
 
 
 function initBoard() {
@@ -60,6 +96,8 @@ function handleMove(e) {
     gameStats[currentPlayer === "X" ? "xWins" : "oWins"]++;
     updateStats();
     highlightWinningCells(winningCells);
+    saveGameState();
+    scheduleAutoRestart();
     return;
   }
 
@@ -68,11 +106,23 @@ function handleMove(e) {
     isRunning = false;
     gameStats.draws++;
     updateStats();
+    saveGameState();
+    scheduleAutoRestart();
     return;
   }
 
+
+  if (difficulty === "pvp") {
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
+    statusEl.textContent = `Ход: ${currentPlayer}`;
+    saveGameState();
+    return;
+  }
+
+ 
   currentPlayer = "O";
   statusEl.textContent = "Ход: O (бот думает...)";
+  saveGameState();
   
   setTimeout(() => {
     makeBotMove();
@@ -127,6 +177,8 @@ function makeBotMove() {
       gameStats.oWins++;
       updateStats();
       highlightWinningCells(winningCells);
+      saveGameState();
+      scheduleAutoRestart();
       return;
     }
 
@@ -135,11 +187,14 @@ function makeBotMove() {
       isRunning = false;
       gameStats.draws++;
       updateStats();
+      saveGameState();
+      scheduleAutoRestart();
       return;
     }
 
     currentPlayer = "X";
     statusEl.textContent = "Ход: X";
+    saveGameState();
   }
 }
 
@@ -196,19 +251,39 @@ function getSmartMove() {
 
 function setDifficulty(level) {
   difficulty = level;
+  pvpBtn.classList.toggle("active", level === "pvp");
   easyBtn.classList.toggle("active", level === "easy");
   hardBtn.classList.toggle("active", level === "hard");
   
-  if (level === "easy") {
+  if (level === "pvp") {
+    difficultyDisplay.textContent = "👥 Выбран режим: PvP";
+  } else if (level === "easy") {
     difficultyDisplay.textContent = "😊 Выбран режим: Легкий";
   } else {
     difficultyDisplay.textContent = "🤖 Выбран режим: Тяжелый";
   }
   
   statusEl.textContent = "Ход: X";
+  saveGameState();
+}
+
+function scheduleAutoRestart() {
+  let countdown = 4;
+  const originalStatus = statusEl.textContent;
+  
+  const countdownInterval = setInterval(() => {
+    statusEl.innerHTML = `${originalStatus}<br><span style="font-size: 0.9rem; opacity: 0.8;">⏱ Новая игра через ${countdown}...</span>`;
+    countdown--;
+    
+    if (countdown < 0) {
+      clearInterval(countdownInterval);
+      restart();
+    }
+  }, 1000);
 }
 
 function restart() {
+  clearGameState();
   board = Array(9).fill("");
   currentPlayer = "X";
   isRunning = true;
@@ -219,7 +294,27 @@ function restart() {
 
 restartBtn.addEventListener("click", restart);
 
+pvpBtn.addEventListener("click", () => setDifficulty("pvp"));
 easyBtn.addEventListener("click", () => setDifficulty("easy"));
 hardBtn.addEventListener("click", () => setDifficulty("hard"));
+
+if (loadGameState()) {
+
+  updateStats();
+  if (difficulty === "pvp") {
+    difficultyDisplay.textContent = "👥 Выбран режим: PvP";
+  } else if (difficulty === "easy") {
+    difficultyDisplay.textContent = "😊 Выбран режим: Легкий";
+  } else if (difficulty === "hard") {
+    difficultyDisplay.textContent = "🤖 Выбран режим: Тяжелый";
+  }
+  pvpBtn.classList.toggle("active", difficulty === "pvp");
+  easyBtn.classList.toggle("active", difficulty === "easy");
+  hardBtn.classList.toggle("active", difficulty === "hard");
+  
+  if (isRunning) {
+    statusEl.textContent = `Ход: ${currentPlayer}`;
+  }
+}
 
 initBoard();

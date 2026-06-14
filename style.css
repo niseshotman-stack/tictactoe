@@ -6,7 +6,7 @@
 
 body {
   font-family: 'Arial', sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 33.33%, #0039A6 33.33%, #0039A6 66.66%, #FF0000 66.66%, #FF0000 100%);
   color: white;
   display: flex;
   justify-content: center;
@@ -33,39 +33,42 @@ h1 {
 .difficulty {
   margin-bottom: 20px;
   padding: 15px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 57, 166, 0.85);
   border-radius: 10px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid #0039A6;
 }
 
 .difficulty p {
   margin-bottom: 12px;
   font-size: 0.95rem;
-  opacity: 0.9;
+  opacity: 1;
+  color: white;
 }
 
 .difficulty-btn {
   padding: 10px 20px;
   margin: 0 8px 10px 0;
   font-size: 0.9rem;
-  background: rgba(255, 255, 255, 0.2);
+  background: #0039A6;
   color: white;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid #0039A6;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 .difficulty-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: #002A7A;
+  border-color: #002A7A;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 57, 166, 0.4);
 }
 
 .difficulty-btn.active {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  border-color: #f5576c;
-  box-shadow: 0 0 15px rgba(245, 87, 108, 0.5);
+  background: #FF0000;
+  border-color: #FF0000;
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
 }
 
 #currentDifficulty {
@@ -96,6 +99,7 @@ h1 {
   grid-template-rows: repeat(3, 100px);
   gap: 8px;
   margin: 30px auto;
+  width: fit-content;
   background: rgba(255, 255, 255, 0.1);
   padding: 10px;
   border-radius: 10px;
