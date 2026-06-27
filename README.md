@@ -11,3 +11,11 @@
 1.Клонируйте репозиторий и перейдите в папку проекта.
 
 2.В папке проекта запустите файл start.bat(в зависимости от вашего браузера), проект откроется в режиме инкогнито.
+
+## Деплой
+
+https://niseshotman-stack.github.io/
+
+## Code Climate
+
+[![Maintainability](https://qlty.sh/gh/niseshotman-stack/projects/niseshotman-stack.github.io/maintainability.svg)](https://qlty.sh/gh/niseshotman-stack/projects/niseshotman-stack.github.io)
